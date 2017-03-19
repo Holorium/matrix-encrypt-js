@@ -1,0 +1,35 @@
+{
+  "name": "matrix-encrypt-js",
+  "version": "0.1.0",
+  "description": "A small library to encrypt / decrypt strings using a matrix (mod n) and it's inverse.",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "mocha",
+    "lint": "eslint index.js src/** test/**",
+    "watch": "watch \"npm run lint && npm test\" ./ src/ test/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Holorium/matrix-encrypt-js.git"
+  },
+  "keywords": [
+    "JavaScript",
+    "Encryption",
+    "Obfuscation"
+  ],
+  "author": "Richard Petersen",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Holorium/matrix-encrypt-js/issues"
+  },
+  "homepage": "https://github.com/Holorium/matrix-encrypt-js#readme",
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "eslint": "^3.18.0",
+    "mocha": "^3.2.0",
+    "watch": "^1.0.2"
+  }
+}
