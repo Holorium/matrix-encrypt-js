@@ -20,24 +20,49 @@ var Encrypter = function (opt) {
 
     if (opt.key) this.key = util.strToMatrix(opt.key);
     else this.key = new Matrix(opt.size || 4).generate(this.residueClass);
+
+    this.invKey = this.key.invert(this.residueClass);
 };
 
 Encrypter.prototype.encrypt = function (str, checksum) {
     // divide into vectors according to the matrix size
     var vectors = [], i;
-    for (i = 0; i < str.length; i += this.key.size) vectors.push(Vector.fromString(str.substr(i, this.key.size)));
+    for (i = 0; i < str.length; i += this.key.size) vectors.push(Vector.fromString(str.substr(i, this.key.size), this.key.size));
     // if checksum is true, prepend checksum vector
     if (checksum === true) vectors.unshift(util.checksum(vectors));
     // encrypt vector wise
     for (i = 0; i < vectors.length; i++) vectors[i] = this.key.transform(vectors[i], this.residueClass);
     return vectors.map(function (v) {
-        return v.toString();
+        return v.toHexString();
     }).join('');
 };
 
 Encrypter.prototype.decrypt = function (str, defaultMessage) {
-    if (defaultMessage) return defaultMessage;
-    return str;
+    var list = str.split('0x');
+    list.shift(); // remove first empty value
+    var vectors = [], i;
+    for (i = 0; i < list.length; i += this.key.size) {
+        vectors.push(Vector.fromNumbers(
+            list.slice(i, i + this.key.size).map(function (l) {
+                return bigInteger(l, 16);
+            }),
+            this.key.size
+        ));
+    }
+    // decrypt vector wise
+    for (i = 0; i < vectors.length; i++) vectors[i] = this.invKey.transform(vectors[i], this.residueClass);
+    // checksum validation
+    if (defaultMessage) {
+        var cryptChecksum = vectors.shift(),
+            contentChecksum = util.checksum(vectors);
+        if (!contentChecksum) return defaultMessage;
+        console.log('cryptChecksum: ', cryptChecksum);
+        console.log('contentChecksum: ', contentChecksum);
+        if (!contentChecksum.equals(cryptChecksum)) return defaultMessage;
+    }
+    return vectors.map(function (v) {
+        return v.toString();
+    }).join('').replace(/\u0000/g, '');
 };
 
 Encrypter.prototype.getKey = function () {

@@ -30,6 +30,7 @@ module.exports = {
     },
 
     checksum: function (vectors) {
+        if (!vectors.length) return;
         var checksum = vectors[0].clone();
         for (var i = 1; i < vectors.length; i++) {
             checksum.XOR(vectors[i]);

@@ -17,10 +17,24 @@ Vector.prototype.clone = function () {
     return self.fromNumbers(this.values);
 };
 
-Vector.prototype.toString = function () {
+Vector.prototype.toHexString = function () {
     return this.values.map(function (val) {
         return '0x' + val.toString(16);
     }).join('');
+};
+
+Vector.prototype.toString = function () {
+    return this.values.map(function (val) {
+        return String.fromCharCode(val.toJSNumber());
+    }).join('');
+};
+
+Vector.prototype.equals = function (other) {
+    if (this.values.length !== other.values.length) return false;
+    for (var i = 0; i < this.values.length; i++) {
+        if (!this.values[i].equals(other.values[i])) return false;
+    }
+    return true;
 };
 
 var self = module.exports = {
@@ -42,9 +56,10 @@ var self = module.exports = {
         return new Vector(values);
     },
 
-    fromNumbers: function (list) {
-        var values = new Array(list.length);
-        for (var i = 0; i < list.length; i++) values[i] = bigInteger(list[i]);
+    fromNumbers: function (list, size) {
+        var values = new Array(size || list.length), i;
+        for (i = 0; i < (size || list.length); i++) values[i] = bigInteger(list[i]);
+        for (i = list.length; i < size; i++) values[i] = 0;
         return new Vector(values);
     },
 

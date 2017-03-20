@@ -33,4 +33,38 @@ describe('matrix-encrypt-js', () => {
         expect(encrypter.encrypt('test', true)).to.equal('0xce0x6b0xd30xfa0x460x9d');
     });
 
+    it('decrypts some text correctly', () => {
+        let text = 'some test',
+            encrypter = new Encrypter({ numBits: 20 }),
+            encryption = encrypter.encrypt(text);
+
+        expect(encrypter.decrypt(encryption)).to.equal(text);
+    });
+
+    it('decrypts some text with checksum', () => {
+        let text = 'some other text',
+            encrypter = new Encrypter({ numBits: 20 }),
+            encryption = encrypter.encrypt(text, true);
+
+        expect(encrypter.decrypt(encryption, 'default string')).to.equal(text);
+    });
+
+    it('fails to decrypt some short text with checksum', () => {
+        let encrypter = new Encrypter({ numBits: 20 }),
+            defaultString = 'default string';
+
+        encrypter.encrypt('and another text', true);
+
+        expect(encrypter.decrypt('0xa0x8', defaultString)).to.equal(defaultString);
+    });
+
+    it('fails to decrypt some text with checksum', () => {
+        let encrypter = new Encrypter({ numBits: 20 }),
+            defaultString = 'default string';
+
+        encrypter.encrypt('test and another text', true);
+
+        expect(encrypter.decrypt('0xa0xb0xc0xd0xe0xf0x10x20x30x40x50x60x7', defaultString)).to.equal(defaultString);
+    });
+
 });
